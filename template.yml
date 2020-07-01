@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  CreateThumbnail:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: code/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      Timeout: 60
+      Policies: AWSLambdaExecute
+      Events:
+        CreateThumbnailEvent:
+          Type: S3
+          Properties:
+            Bucket: !Ref SrcBucket
+            Events: s3:ObjectCreated:*
+  SrcBucket:
+    Type: 'AWS::S3::Bucket'
+  DstBucket:
+    Type: 'AWS::S3::Bucket'
+    DependsOn: SrcBucket
+    Properties:
+      BucketName: !Join
+        - ''
+        - - !Ref SrcBucket
+          - '-resized'
